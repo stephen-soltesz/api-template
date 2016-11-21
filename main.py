@@ -67,9 +67,9 @@ class GreetingCollection(messages.Message):
     items = messages.MessageField(Greeting, 1, repeated=True)
 
 
-STORED_GREETINGS = GreetingCollection(items=[
-    Greeting(message='hello world!', id='banana'),
-    Greeting(message='goodbye world!', id='orange'),
+STORED_GREETINGS = GreetingCollectionEP(items=[
+    GreetingEP(message='hello world!', id='banana'),
+    GreetingEP(message='goodbye world!', id='orange'),
 ])
 ####################################################################
 
@@ -79,6 +79,7 @@ STORED_GREETINGS = GreetingCollection(items=[
 ####################################################################
 
 WEB_CLIENT_ID = '294885104230-a8i6fnv7pcgsg0chm0r8vtihcftkcurj.apps.googleusercontent.com'
+PS_CLIENT_ID = '294885104230-ue8r3k8on02m0kjsu8vh5ulnke7imnrf.apps.googleusercontent.com'
 ADMIN_USERS = ['soltesz@google.com', 'stephen.soltesz@gmail.com']
 
 def authorized(f):
@@ -96,7 +97,7 @@ def authorized(f):
 
 @endpoints.api(name='greeting', version='v1',
                allowed_client_ids=[
-                   WEB_CLIENT_ID, endpoints.API_EXPLORER_CLIENT_ID])
+                   WEB_CLIENT_ID, PS_CLIENT_ID, endpoints.API_EXPLORER_CLIENT_ID])
 class GreetingApi(remote.Service):
 
     @GreetingEP.query_method(query_fields=('limit', 'order', 'pageToken'),
@@ -137,9 +138,10 @@ class GreetingApi(remote.Service):
     @authorized
     def setup2(self, unused_request):
         for greeting in STORED_GREETINGS.items:
-            g = GreetingEP(message=greeting.message)
-            g.key = ndb.Key(GreetingEP, greeting.id)
-            g.put()
+            #g = GreetingEP(message=greeting.message)
+            #g.key = ndb.Key(GreetingEP, greeting.id)
+            #g.put()
+            greeting.put()
         return Result(message='okay')
 
     @endpoints.method(
