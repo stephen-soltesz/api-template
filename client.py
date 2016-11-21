@@ -73,13 +73,15 @@ def main(argv):
     pprint.pprint(response)
 
     response = service.create(body={
-        'id':'clientcheck', 'message':'this is another test'}).execute()
+        'id': 'clientcheck',
+        'message': 'this is another test'}).execute()
     pprint.pprint(response)
 
     response = service.list().execute()
     pprint.pprint(response)
 
-    response = service.delete(body={}, id='clientcheck').execute()
+    response = service.delete(
+        body={}, id='clientcheck').execute()
     pprint.pprint(response)
 
     response = service.list().execute()
