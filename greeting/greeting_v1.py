@@ -209,7 +209,7 @@ class Create(apitools_base_cli.NewCmd):
     """
     client = GetClientFromFlags()
     global_params = GetGlobalParamsFromFlags()
-    request = messages.GreetingEP(
+    request = messages.Greeting(
         )
     if FLAGS['id'].present:
       request.id = FLAGS.id.decode('utf8')
@@ -244,7 +244,7 @@ class Delete(apitools_base_cli.NewCmd):
     """
     client = GetClientFromFlags()
     global_params = GetGlobalParamsFromFlags()
-    request = messages.GreetingEP(
+    request = messages.Greeting(
         id=id.decode('utf8'),
         )
     if FLAGS['message'].present:

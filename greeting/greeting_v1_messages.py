@@ -10,12 +10,8 @@ from apitools.base.protorpclite import messages as _messages
 package = 'greeting'
 
 
-class GreetingAuthcheckRequest(_messages.Message):
-  """A GreetingAuthcheckRequest object."""
-
-
-class GreetingEP(_messages.Message):
-  """A GreetingEP object.
+class Greeting(_messages.Message):
+  """A Greeting object.
 
   Fields:
     id: A string attribute.
@@ -26,20 +22,20 @@ class GreetingEP(_messages.Message):
   message = _messages.StringField(2)
 
 
-class GreetingEPCollection(_messages.Message):
-  """A GreetingEPCollection object.
+class GreetingAuthcheckRequest(_messages.Message):
+  """A GreetingAuthcheckRequest object."""
+
+
+class GreetingCollection(_messages.Message):
+  """A GreetingCollection object.
 
   Fields:
-    items: A GreetingEP attribute.
+    items: A Greeting attribute.
     nextPageToken: A string attribute.
   """
 
-  items = _messages.MessageField('GreetingEP', 1, repeated=True)
+  items = _messages.MessageField('Greeting', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
-
-
-class GreetingEPProto(_messages.Message):
-  """A GreetingEPProto object."""
 
 
 class GreetingGetRequest(_messages.Message):
@@ -64,6 +60,10 @@ class GreetingListRequest(_messages.Message):
   limit = _messages.IntegerField(1)
   order = _messages.StringField(2)
   pageToken = _messages.StringField(3)
+
+
+class GreetingProto(_messages.Message):
+  """A GreetingProto object."""
 
 
 class GreetingSetup2Request(_messages.Message):

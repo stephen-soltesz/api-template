@@ -76,10 +76,10 @@ class GreetingV1(base_api.BaseApiClient):
       """Create method for the api service.
 
       Args:
-        request: (GreetingEP) input message
+        request: (Greeting) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (GreetingEP) The response message.
+        (Greeting) The response message.
       """
       config = self.GetMethodConfig('Create')
       return self._RunMethod(
@@ -93,8 +93,8 @@ class GreetingV1(base_api.BaseApiClient):
         query_params=[],
         relative_path=u'greetings2',
         request_field='<request>',
-        request_type_name=u'GreetingEP',
-        response_type_name=u'GreetingEP',
+        request_type_name=u'Greeting',
+        response_type_name=u'Greeting',
         supports_download=False,
     )
 
@@ -102,10 +102,10 @@ class GreetingV1(base_api.BaseApiClient):
       """Delete method for the api service.
 
       Args:
-        request: (GreetingEP) input message
+        request: (Greeting) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (GreetingEPProto) The response message.
+        (GreetingProto) The response message.
       """
       config = self.GetMethodConfig('Delete')
       return self._RunMethod(
@@ -119,8 +119,8 @@ class GreetingV1(base_api.BaseApiClient):
         query_params=[],
         relative_path=u'greetings2/{id}',
         request_field='<request>',
-        request_type_name=u'GreetingEP',
-        response_type_name=u'GreetingEPProto',
+        request_type_name=u'Greeting',
+        response_type_name=u'GreetingProto',
         supports_download=False,
     )
 
@@ -131,7 +131,7 @@ class GreetingV1(base_api.BaseApiClient):
         request: (GreetingGetRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (GreetingEP) The response message.
+        (Greeting) The response message.
       """
       config = self.GetMethodConfig('Get')
       return self._RunMethod(
@@ -146,7 +146,7 @@ class GreetingV1(base_api.BaseApiClient):
         relative_path=u'greetings2/{id}',
         request_field='',
         request_type_name=u'GreetingGetRequest',
-        response_type_name=u'GreetingEP',
+        response_type_name=u'Greeting',
         supports_download=False,
     )
 
@@ -157,7 +157,7 @@ class GreetingV1(base_api.BaseApiClient):
         request: (GreetingListRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (GreetingEPCollection) The response message.
+        (GreetingCollection) The response message.
       """
       config = self.GetMethodConfig('List')
       return self._RunMethod(
@@ -172,7 +172,7 @@ class GreetingV1(base_api.BaseApiClient):
         relative_path=u'greetings2',
         request_field='',
         request_type_name=u'GreetingListRequest',
-        response_type_name=u'GreetingEPCollection',
+        response_type_name=u'GreetingCollection',
         supports_download=False,
     )
 

@@ -21,6 +21,10 @@
 
     ./client.py
 
+6. Regenerate the apitools library
+
+    gen_client --discovery_url=https://dash-test-1.appspot.com/_ah/api/discovery/v1/apis/greeting/v1/rest \
+        --overwrite --outdir=greeting --root_package=. client
 
 ## Linux
 
