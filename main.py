@@ -14,6 +14,7 @@
 
 """This is a sample Hello World API implemented using Google Cloud Endpoints."""
 
+
 import endpoints
 import functools
 import logging
@@ -83,18 +84,20 @@ def authorized(f):
     return admin_check
 
 
-@endpoints.api(name='greeting', version='v1',
-               allowed_client_ids=ALLOWED_CLIENT_IDS)
+api_root = endpoints.api(name='greeting', version='v1',
+                         allowed_client_ids=ALLOWED_CLIENT_IDS,
+                         auth_level=endpoints.AUTH_LEVEL.REQUIRED)
+
+@api_root.api_class(path='greetings')
 class GreetingApi(remote.Service):
 
-    @Greeting.query_method(query_fields=('limit', 'order', 'pageToken'),
-                           path='greetings2')
+    @Greeting.query_method(query_fields=('limit', 'order', 'pageToken'))
     @authorized
     def list(self, query):
         logging.debug('query: %s', query)
         return query
 
-    @Greeting.method(path='greetings2/{id}', http_method='GET')
+    @Greeting.method(path='{id}', http_method='GET')
     @authorized
     def get(self, greeting):
         if not greeting.from_datastore:
@@ -102,14 +105,13 @@ class GreetingApi(remote.Service):
                     'Greeting not found: "%s"' % greeting.key.id())
         return greeting
 
-    @Greeting.method(path='greetings2', http_method='POST')
+    @Greeting.method()
     @authorized
     def create(self, greeting):
         greeting.put()
         return greeting
 
-    @Greeting.method(
-        response_fields=(), path='greetings2/{id}', http_method='POST')
+    @Greeting.method(path='{id}') # , response_fields=())
     @authorized
     def delete(self, greeting):
         if not greeting.from_datastore:
@@ -146,5 +148,5 @@ class GreetingApi(remote.Service):
 
 
 
-# The api server.
+# API server.
 api = endpoints.api_server([GreetingApi])
