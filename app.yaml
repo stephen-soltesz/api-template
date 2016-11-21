@@ -17,6 +17,9 @@ handlers:
 - url: /_ah/spi/.*
   script: main.api
 
+- url: /.*
+  script: web.app
+
 #  login: required
 #  auth_fail_action: unauthorized
 
