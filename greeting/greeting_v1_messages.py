@@ -62,10 +62,6 @@ class GreetingListRequest(_messages.Message):
   pageToken = _messages.StringField(3)
 
 
-class GreetingProto(_messages.Message):
-  """A GreetingProto object."""
-
-
 class GreetingSetup2Request(_messages.Message):
   """A GreetingSetup2Request object."""
 

@@ -65,7 +65,7 @@ class GreetingV1(base_api.BaseApiClient):
         ordered_params=[],
         path_params=[],
         query_params=[],
-        relative_path=u'authcheck',
+        relative_path=u'greetings/authcheck',
         request_field='',
         request_type_name=u'GreetingAuthcheckRequest',
         response_type_name=u'MainResult',
@@ -91,7 +91,7 @@ class GreetingV1(base_api.BaseApiClient):
         ordered_params=[],
         path_params=[],
         query_params=[],
-        relative_path=u'greetings',
+        relative_path=u'greetings/create',
         request_field='<request>',
         request_type_name=u'Greeting',
         response_type_name=u'Greeting',
@@ -105,7 +105,7 @@ class GreetingV1(base_api.BaseApiClient):
         request: (Greeting) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (GreetingProto) The response message.
+        (Greeting) The response message.
       """
       config = self.GetMethodConfig('Delete')
       return self._RunMethod(
@@ -120,7 +120,7 @@ class GreetingV1(base_api.BaseApiClient):
         relative_path=u'greetings/{id}',
         request_field='<request>',
         request_type_name=u'Greeting',
-        response_type_name=u'GreetingProto',
+        response_type_name=u'Greeting',
         supports_download=False,
     )
 
@@ -169,7 +169,7 @@ class GreetingV1(base_api.BaseApiClient):
         ordered_params=[],
         path_params=[],
         query_params=[u'limit', u'order', u'pageToken'],
-        relative_path=u'list',
+        relative_path=u'greetings/list',
         request_field='',
         request_type_name=u'GreetingListRequest',
         response_type_name=u'GreetingCollection',
@@ -195,7 +195,7 @@ class GreetingV1(base_api.BaseApiClient):
         ordered_params=[],
         path_params=[],
         query_params=[],
-        relative_path=u'setup2',
+        relative_path=u'greetings/setup2',
         request_field='',
         request_type_name=u'GreetingSetup2Request',
         response_type_name=u'MainResult',
