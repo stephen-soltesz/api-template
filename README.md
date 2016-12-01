@@ -63,13 +63,3 @@
 
         $ python -m hosts_py.hosts_v1 list
 
-
-## Junk
-
-List example:
-* this is the first item.
-* this is a really really long item that has a bunch of text that would extend
-  way beyond 80 cols if it were not line wrapped. But it is line wrapped and
-  we're trying to see if it will work with github markdown. So, let us see what
-  happens.
-* An item after the giant wrapped item above.
