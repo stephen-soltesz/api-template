@@ -32,8 +32,17 @@ func init() {
 	info := api.MethodByName("List").Info()
 	info.Name, info.HTTPMethod, info.Path = "list", "GET", "hosts"
 
-	info = api.MethodByName("Add").Info()
-	info.Name, info.HTTPMethod, info.Path = "add", "POST", "hosts"
+	info = api.MethodByName("Create").Info()
+	info.Name, info.HTTPMethod, info.Path = "create", "POST", "hosts"
+
+	info = api.MethodByName("Delete").Info()
+	info.Name, info.HTTPMethod, info.Path = "delete", "POST", "hosts/{id}"
+
+	info = api.MethodByName("Get").Info()
+	info.Name, info.HTTPMethod, info.Path = "get", "GET", "hosts/{id}"
+
+	info = api.MethodByName("Setup").Info()
+	info.Name, info.HTTPMethod, info.Path = "setup", "GET", "setup"
 
 	// start handling cloud endpoint requests.
 	endpoints.HandleHTTP()
