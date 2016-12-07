@@ -1,19 +1,19 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"zRMgE0l9nVDW4S28VYYcYQF9UW4/N4YdQ4SBYkHO9CknwBY_kR93OHE\"",
+ "etag": "\"ODRTh3xaRR64wpeXJSlF33HMN-0/dgmjH8_30KdAMYlG4LpXP9bopeE\"",
  "discoveryVersion": "v1",
  "id": "hosts:v1",
  "name": "hosts",
  "version": "v1",
- "description": "Hosts API",
+ "description": "Hosts API (Golang)",
  "icons": {
-  "x16": "http://www.google.com/images/icons/product/search-16.gif",
-  "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+  "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
  },
  "protocol": "rest",
- "baseUrl": "http://localhost:8080/_ah/api/hosts/v1/",
+ "baseUrl": "https://dash-test-1.appspot.com/_ah/api/hosts/v1/",
  "basePath": "/_ah/api/hosts/v1/",
- "rootUrl": "http://localhost:8080/_ah/api/",
+ "rootUrl": "https://dash-test-1.appspot.com/_ah/api/",
  "servicePath": "hosts/v1/",
  "batchPath": "batch",
  "parameters": {
@@ -61,46 +61,37 @@
    "location": "query"
   }
  },
+ "auth": {
+  "oauth2": {
+   "scopes": {
+    "https://www.googleapis.com/auth/userinfo.email": {
+     "description": "View your email address"
+    }
+   }
+  }
+ },
  "schemas": {
-  "CreateRequest": {
-   "id": "CreateRequest",
-   "type": "object",
-   "properties": {
-    "id": {
-     "type": "string"
-    }
-   }
-  },
-  "DeleteRequest": {
-   "id": "DeleteRequest",
-   "type": "object",
-   "properties": {
-    "id": {
-     "type": "string"
-    }
-   }
-  },
-  "HostRecord": {
-   "id": "HostRecord",
+  "Host": {
+   "id": "Host",
    "type": "object",
    "properties": {
     "created": {
      "type": "string",
      "format": "date-time"
     },
-    "ip_address": {
+    "id": {
      "type": "string"
     }
    }
   },
-  "Hosts": {
-   "id": "Hosts",
+  "HostCollection": {
+   "id": "HostCollection",
    "type": "object",
    "properties": {
-    "hosts": {
+    "items": {
      "type": "array",
      "items": {
-      "$ref": "HostRecord"
+      "$ref": "Host"
      }
     }
    }
@@ -112,12 +103,15 @@
    "path": "hosts",
    "httpMethod": "POST",
    "request": {
-    "$ref": "CreateRequest",
+    "$ref": "Host",
     "parameterName": "resource"
    },
    "response": {
-    "$ref": "HostRecord"
-   }
+    "$ref": "Host"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
   },
   "delete": {
    "id": "hosts.delete",
@@ -134,12 +128,15 @@
     "id"
    ],
    "request": {
-    "$ref": "DeleteRequest",
+    "$ref": "Host",
     "parameterName": "resource"
    },
    "response": {
-    "$ref": "HostRecord"
-   }
+    "$ref": "Host"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
   },
   "get": {
    "id": "hosts.get",
@@ -156,24 +153,33 @@
     "id"
    ],
    "response": {
-    "$ref": "HostRecord"
-   }
+    "$ref": "Host"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
   },
   "list": {
    "id": "hosts.list",
    "path": "hosts",
    "httpMethod": "GET",
    "response": {
-    "$ref": "Hosts"
-   }
+    "$ref": "HostCollection"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
   },
   "setup": {
    "id": "hosts.setup",
    "path": "setup",
    "httpMethod": "GET",
    "response": {
-    "$ref": "HostRecord"
-   }
+    "$ref": "Host"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
   }
  }
 }
