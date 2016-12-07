@@ -17,8 +17,8 @@ import (
 )
 
 type HostRecord struct {
-	IPAddress string    `json:"ip_address" endpoints:"req"`
-	Created   time.Time `json:"created"`
+	IPAddress string    `json:"ip_address" endpoints:"req" datastore:"id"`
+	Created   time.Time `json:"created" datastore:"created"`
 }
 
 func init() {
