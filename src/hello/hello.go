@@ -44,7 +44,8 @@ func init() {
 	info = api.MethodByName("Setup").Info()
 	info.Name, info.HTTPMethod, info.Path = "setup", "GET", "setup"
 
-	// start handling cloud endpoint requests.
+	// Start handling cloud endpoint requests.
+	endpoints.DefaultServer.ContextDecorator = AuthDecorator
 	endpoints.HandleHTTP()
 
 	// http.HandleFunc("/v1/hosts/127.0.0.1/proofOfConcept", Handler)
