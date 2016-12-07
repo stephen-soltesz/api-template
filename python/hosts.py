@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This is a sample Hello World API implemented using Google Cloud Endpoints."""
+"""This is a sample Hosts API implemented using Google Cloud Endpoints."""
 
 
 import datetime
@@ -44,6 +44,10 @@ class Hosts(endpoints_model.EndpointsModel):
     def id(self):
       if self.key is not None:
         return self.key.string_id()
+
+    @property
+    def ip_address(self):
+        return self.id
 
 
 ####################################################################
