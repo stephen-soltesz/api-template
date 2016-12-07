@@ -24,6 +24,11 @@ handlers:
 #  auth_fail_action: unauthorized
 
 
+skip_files:
+- .*.gz
+- .*.zip
+
+
 libraries:
 - name: pycrypto
   version: 2.6
