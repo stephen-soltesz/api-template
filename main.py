@@ -15,6 +15,7 @@
 """This is a sample Hello World API implemented using Google Cloud Endpoints."""
 
 
+import datetime
 import endpoints
 import functools
 import logging
@@ -29,10 +30,9 @@ from protorpc import message_types
 from protorpc import messages
 from protorpc import remote
 
-# print 'file', endpoints.__file__
 
-class Greeting(endpoints_model.EndpointsModel):
-    message = ndb.StringProperty()
+class Hosts(endpoints_model.EndpointsModel):
+    created = ndb.DateTimeProperty()
 
     # Define IdSet() and id() to require a string id.
     def IdSet(self, value):
@@ -52,15 +52,16 @@ class Result(messages.Message):
     message = messages.StringField(1)
 
 
-STORED_GREETINGS = [
-    Greeting(message='hello world!', id='banana'),
-    Greeting(message='goodbye world!', id='orange'),
+STORED_HOSTS = [
+    Hosts(id='192.168.1.1'),
+    Hosts(id='127.0.0.1'),
+    Hosts(id='10.3.4.22'),
 ]
 ####################################################################
 
 
 ####################################################################
-# The Greeting API
+# The Hosts API
 ####################################################################
 
 WEB_CLIENT_ID = '294885104230-a8i6fnv7pcgsg0chm0r8vtihcftkcurj.apps.googleusercontent.com'
@@ -84,50 +85,52 @@ def authorized(f):
     return admin_check
 
 
-api_root = endpoints.api(name='greeting', version='v1',
+api_root = endpoints.api(name='hosts', version='v1',
                          allowed_client_ids=ALLOWED_CLIENT_IDS,
                          auth_level=endpoints.AUTH_LEVEL.REQUIRED)
 
-@api_root.api_class(path='greetings')
-class GreetingApi(remote.Service):
+@api_root.api_class(path='hosts')
+class HostsApi(remote.Service):
 
-    @Greeting.query_method(query_fields=('limit', 'order', 'pageToken'))
+    @Hosts.query_method(query_fields=('limit', 'order', 'pageToken'))
     @authorized
     def list(self, query):
         logging.debug('query: %s', query)
         return query
 
-    @Greeting.method(path='{id}', http_method='GET')
+    @Hosts.method(path='{id}', http_method='GET')
     @authorized
-    def get(self, greeting):
-        if not greeting.from_datastore:
+    def get(self, host):
+        if not host.from_datastore:
             raise endpoints.NotFoundException(
-                    'Greeting not found: "%s"' % greeting.key.id())
-        return greeting
+                    'Hosts not found: "%s"' % host.key.id())
+        return host
 
-    @Greeting.method()
+    @Hosts.method()
     @authorized
-    def create(self, greeting):
-        greeting.put()
-        return greeting
+    def create(self, host):
+        host.created = datetime.datetime.now()
+        host.put()
+        return host
 
-    @Greeting.method(path='{id}') # , response_fields=())
+    @Hosts.method(path='{id}')
     @authorized
-    def delete(self, greeting):
-        if not greeting.from_datastore:
+    def delete(self, host):
+        if not host.from_datastore:
             raise endpoints.NotFoundException(
-                    'Greeting not found: "%s"' % greeting.key.id())
-        greeting.key.delete()
-        return greeting
+                    'Hosts not found: "%s"' % host.key.id())
+        host.key.delete()
+        return host
 
 
     # TEMPORARY
     @endpoints.method(
-        message_types.VoidMessage, Result, path='setup2', http_method='GET')
+        message_types.VoidMessage, Result, path='setup', http_method='GET')
     @authorized
-    def setup2(self, unused_request):
-        for greeting in STORED_GREETINGS:
-            greeting.put()
+    def setup(self, unused_request):
+        for host in STORED_HOSTS:
+            host.created = datetime.datetime.now()
+            host.put()
         return Result(message='okay')
 
     @endpoints.method(
@@ -149,4 +152,4 @@ class GreetingApi(remote.Service):
 
 
 # API server.
-api = endpoints.api_server([GreetingApi])
+api = endpoints.api_server([HostsApi])
