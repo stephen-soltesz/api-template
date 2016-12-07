@@ -11,49 +11,48 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package hello
+package hostsapi
 
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
 
 	"golang.org/x/net/context"
-	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
-	"google.golang.org/appengine/log"
 )
 
 // Host records represent a single machine.
 type Host struct {
-	IPAddress string    `json:"ip_address" endpoints:"req"`
+	IPAddress string    `json:"id" endpoints:"req" datastore:"id"`
 	Created   time.Time `json:"created" datastore:"created"`
+}
+
+// RegisterMethod adds metadata to map the RPCService to an endpoints discovery document.
+func RegisterMethod(api *endpoints.RPCService, realName, httpMethod, httpPath, scope string) {
+	info := api.MethodByName(realName).Info()
+	info.Name = strings.ToLower(realName)
+	info.HTTPMethod = httpMethod
+	info.Path = httpPath
+	info.Scopes = append(info.Scopes, scope)
 }
 
 func init() {
 	// register the quotes API with cloud endpoints.
-	api, err := endpoints.RegisterService(&HostsAPI{}, "hosts", "v1", "Hosts API", true)
+	api, err := endpoints.RegisterService(&HostsAPI{}, "hosts", "v1", "Hosts API (Golang)", true)
 	if err != nil {
 		panic(err)
 	}
 
 	// Setup the endpoint for each API function.
-	info := api.MethodByName("List").Info()
-	info.Name, info.HTTPMethod, info.Path = "list", "GET", "hosts"
-
-	info = api.MethodByName("Create").Info()
-	info.Name, info.HTTPMethod, info.Path = "create", "POST", "hosts"
-
-	info = api.MethodByName("Delete").Info()
-	info.Name, info.HTTPMethod, info.Path = "delete", "POST", "hosts/{id}"
-
-	info = api.MethodByName("Get").Info()
-	info.Name, info.HTTPMethod, info.Path = "get", "GET", "hosts/{id}"
-
-	info = api.MethodByName("Setup").Info()
-	info.Name, info.HTTPMethod, info.Path = "setup", "GET", "setup"
+	RegisterMethod(api, "List", "GET", "hosts", endpoints.EmailScope)
+	RegisterMethod(api, "Create", "POST", "hosts", endpoints.EmailScope)
+	RegisterMethod(api, "Delete", "POST", "hosts/{id}", endpoints.EmailScope)
+	RegisterMethod(api, "Get", "GET", "hosts/{id}", endpoints.EmailScope)
+	RegisterMethod(api, "Setup", "GET", "setup", endpoints.EmailScope)
 
 	// Start handling cloud endpoint requests.
 	endpoints.DefaultServer.ContextDecorator = AuthDecorator
@@ -63,6 +62,7 @@ func init() {
 	http.HandleFunc("/", HelloHandler)
 }
 
+// GetHost retrieves a Host record from Datastore.
 func GetHost(ctx context.Context, ipaddr string) (*Host, error) {
 	var h Host
 	key := datastore.NewKey(ctx, "HostsGo", ipaddr, 0, nil)
@@ -72,10 +72,11 @@ func GetHost(ctx context.Context, ipaddr string) (*Host, error) {
 	return &h, nil
 }
 
+// PutHost saves a Host record to Datstore.
 func PutHost(ctx context.Context, ipaddr string) (*Host, error) {
 	h := Host{
 		IPAddress: ipaddr,
-		// NOTE: python fails to decode the format of the 'date-time' type at nanosecond resolution.
+		// NOTE: python clients fail to decode the format of the 'date-time' type at nanosecond resolution.
 		Created: time.Now().UTC().Truncate(time.Second),
 	}
 	key := datastore.NewKey(ctx, "HostsGo", ipaddr, 0, nil)
@@ -85,45 +86,7 @@ func PutHost(ctx context.Context, ipaddr string) (*Host, error) {
 	return &h, nil
 }
 
+// A generic request handler.
 func HelloHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, world")
-}
-
-func Handler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
-
-	// Get remote IP.
-	remoteIp, ok := r.Header["X-Appengine-Remote-Addr"]
-	if !ok {
-		log.Errorf(ctx, "Found no host address for header: X-Appengine-Remote-Addr")
-		return
-	}
-	log.Infof(ctx, "This is a test request for %s.", remoteIp[0])
-
-	// Log all headers for fun.
-	for k, v := range r.Header {
-		log.Infof(ctx, "%s %s", k, v)
-	}
-
-	// Try to get a pre-defined host record.
-	log.Infof(ctx, "About to call datastore.Get()")
-	h, err := GetHost(ctx, remoteIp[0])
-	if err != nil {
-		log.Infof(ctx, "Did not find %s in datastore: %s", remoteIp[0], err)
-
-		log.Infof(ctx, "Trying to datastore.Put() new record for: %s", remoteIp[0])
-		h, err = PutHost(ctx, remoteIp[0])
-		if err != nil {
-			log.Infof(ctx, "Failed to put %s in datastore: %s", remoteIp[0], err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		log.Infof(ctx, "Saved the Host record for %#v", h)
-	}
-	log.Infof(ctx, "Retrieved the Host record for %#v", h)
-
-	// Basic response.
-	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprint(w, `{"Stage2URL": "https://storage.googleapis.com/dash-test-1/stage2/stage2.json"}`)
-
 }
