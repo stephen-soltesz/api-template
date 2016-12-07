@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """This is a sample Hosts API implemented using Google Cloud Endpoints."""
 
 
@@ -31,8 +30,23 @@ from protorpc import messages
 from protorpc import remote
 
 
-class Hosts(endpoints_model.EndpointsModel):
+class Host(endpoints_model.EndpointsModel):
+    """A Host Entity represents a machine record."""
+    # Reset default from messages.StringField so clients see a date-time format.
+    # created = endpoints_model.EndpointsDateTimeProperty() # ndb.DateTimeProperty()
     created = ndb.DateTimeProperty()
+
+    # Should help convert DateTimeProperty to a correct date-time format, however,
+    # there appears to be some bug that still prevents this:
+    # https://github.com/GoogleCloudPlatform/endpoints-proto-datastore/issues/83
+    # _custom_property_to_proto = {
+    #     # fails.
+    #     endpoints_model.EndpointsDateTimeProperty: message_types.DateTimeField
+    #     # fails.
+    #     ndb.DateTimeProperty: message_types.DateTimeField
+    #     # works, but is the wrong type of course for a datetime object.
+    #     ndb.DateTimeProperty: messages.BytesField
+    # }
 
     # Define IdSet() and id() to require a string id.
     def IdSet(self, value):
@@ -52,14 +66,10 @@ class Hosts(endpoints_model.EndpointsModel):
 
 ####################################################################
 # TEMPORARY
-class Result(messages.Message):
-    message = messages.StringField(1)
-
-
 STORED_HOSTS = [
-    Hosts(id='192.168.1.1'),
-    Hosts(id='127.0.0.1'),
-    Hosts(id='10.3.4.22'),
+    Host(id='192.168.1.1'),
+    Host(id='127.0.0.1'),
+    Host(id='10.3.4.22'),
 ]
 ####################################################################
 
@@ -68,12 +78,10 @@ STORED_HOSTS = [
 # The Hosts API
 ####################################################################
 
-WEB_CLIENT_ID = '294885104230-a8i6fnv7pcgsg0chm0r8vtihcftkcurj.apps.googleusercontent.com'
 PS_CLIENT_ID = '294885104230-ue8r3k8on02m0kjsu8vh5ulnke7imnrf.apps.googleusercontent.com'
 ADMIN_USERS = ['soltesz@google.com', 'stephen.soltesz@gmail.com']
 
-ALLOWED_CLIENT_IDS = [
-    WEB_CLIENT_ID, PS_CLIENT_ID, endpoints.API_EXPLORER_CLIENT_ID]
+ALLOWED_CLIENT_IDS = [PS_CLIENT_ID, endpoints.API_EXPLORER_CLIENT_ID]
 
 
 def authorized(f):
@@ -89,70 +97,53 @@ def authorized(f):
     return admin_check
 
 
-api_root = endpoints.api(name='hosts', version='v1',
-                         allowed_client_ids=ALLOWED_CLIENT_IDS,
-                         auth_level=endpoints.AUTH_LEVEL.REQUIRED)
-
-@api_root.api_class(path='hosts')
+@endpoints.api(name='hosts', version='v1',
+               allowed_client_ids=ALLOWED_CLIENT_IDS,
+               auth_level=endpoints.AUTH_LEVEL.REQUIRED,
+               description='Hosts API (Python)')
 class HostsApi(remote.Service):
 
-    @Hosts.query_method(query_fields=('limit', 'order', 'pageToken'))
+    # TODO: enable standard query_fields=('limit', 'order', 'pageToken').
+    @Host.query_method(path='hosts', query_fields=())
     @authorized
     def list(self, query):
         logging.debug('query: %s', query)
         return query
 
-    @Hosts.method(path='{id}', http_method='GET')
+    @Host.method(path='hosts/{id}', http_method='GET')
     @authorized
     def get(self, host):
         if not host.from_datastore:
             raise endpoints.NotFoundException(
-                    'Hosts not found: "%s"' % host.key.id())
+                    'Host not found: "%s"' % host.key.id())
         return host
 
-    @Hosts.method()
+    @Host.method(path='hosts')
     @authorized
     def create(self, host):
         host.created = datetime.datetime.now()
         host.put()
         return host
 
-    @Hosts.method(path='{id}')
+    @Host.method(path='hosts/{id}')
     @authorized
     def delete(self, host):
         if not host.from_datastore:
             raise endpoints.NotFoundException(
-                    'Hosts not found: "%s"' % host.key.id())
+                    'Host not found: "%s"' % host.key.id())
         host.key.delete()
         return host
 
-
     # TEMPORARY
-    @endpoints.method(
-        message_types.VoidMessage, Result, path='setup', http_method='GET')
+    @Host.method(
+        request_message=message_types.VoidMessage, path='setup',
+        http_method='GET')
     @authorized
     def setup(self, unused_request):
         for host in STORED_HOSTS:
             host.created = datetime.datetime.now()
             host.put()
-        return Result(message='okay')
-
-    @endpoints.method(
-        message_types.VoidMessage, Result,
-        path='authcheck', http_method='GET')
-    def authcheck(self, unused_request):
-        user = endpoints.get_current_user()
-        if not user:
-            raise endpoints.ForbiddenException(
-                'Users must be authenticated!')
-        msg = user.email()
-        if users.is_current_user_admin():
-            msg += ' is ADMIN'
-        else:
-            msg += ' is not admin'
-        logging.info('authcheck: %s', msg)
-        return Result(message=msg)
-
+        return host
 
 
 # API server.
