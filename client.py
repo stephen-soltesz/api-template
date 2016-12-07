@@ -40,7 +40,7 @@ def main(argv):
         parents=[tools.argparser])
     parser.add_argument('--hostname', default='dash-test-1.appspot.com',
         help='FQDN for the appengine app.')
-    parser.add_argument('--api', default='greeting', help='The API name.')
+    parser.add_argument('--api', default='hosts', help='The API name.')
     parser.add_argument('--version', default='v1', help='The API version.')
 
     flags = parser.parse_args(argv[1:])
@@ -66,22 +66,16 @@ def main(argv):
         http=http, cache_discovery=False)
 
     # Setup datastore.
-    response = service.setup2().execute()
+    response = service.setup().execute()
     pprint.pprint(response)
 
-    response = service.authcheck().execute()
-    pprint.pprint(response)
-
-    response = service.create(body={
-        'id': 'clientcheck',
-        'message': 'this is another test'}).execute()
+    response = service.create(body={'id': '64.123.0.65'}).execute()
     pprint.pprint(response)
 
     response = service.list().execute()
     pprint.pprint(response)
 
-    response = service.delete(
-        body={}, id='clientcheck').execute()
+    response = service.delete(body={}, id='64.123.0.65').execute()
     pprint.pprint(response)
 
     response = service.list().execute()
