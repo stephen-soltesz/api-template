@@ -2,7 +2,7 @@
 
 1. Install Google Cloud SDK (which includes AppEngine Python SDK)
 
-    ./setup.sh
+       ./setup.sh
 
 2. Install `endpoints_proto_datastore` module.
 
