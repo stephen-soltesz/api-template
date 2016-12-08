@@ -12,72 +12,54 @@ import httplib2
 import oauth2client
 from oauth2client import tools
 
+import local_oauth
 
-logging.basicConfig(level=logging.DEBUG)
-
-SCOPE = 'https://www.googleapis.com/auth/userinfo.email'
-USER_AGENT = 'sample-cmdline-tool/1.0'
-OAUTH_DISPLAY_NAME = 'Sample API Commandline Tool'
-CLIENT_ID = '294885104230-a8i6fnv7pcgsg0chm0r8vtihcftkcurj.apps.googleusercontent.com'
-CLIENT_SECRET = 'pK_9Txg8jRP9ll_ttYxwxlzk'
-CLIENT_ID = '294885104230-ue8r3k8on02m0kjsu8vh5ulnke7imnrf.apps.googleusercontent.com'
-CLIENT_SECRET = 'g1bLl_oz-2bGqI12Blvr3tLU'
-
-CREDENTIALS_FILE = os.path.join(os.environ['HOME'], '.api_credentials')
-
-OAUTH2_FLOW = oauth2client.client.OAuth2WebServerFlow(
-    client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET,
-    scope=SCOPE,
-    user_agent=USER_AGENT,
-    oauth_displayname=OAUTH_DISPLAY_NAME, prompt='consent')
 
 def main(argv):
-    # Parse command line flags used by the oauth2client library.
-    parser = argparse.ArgumentParser(
-        description='Auth sample',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        parents=[tools.argparser])
-    parser.add_argument('--hostname', default='dash-test-1.appspot.com',
-        help='FQDN for the appengine app.')
-    parser.add_argument('--api', default='hosts', help='The API name.')
-    parser.add_argument('--version', default='v1', help='The API version.')
+    parser = local_oauth.GetOAuth2OptionsParser()
 
-    flags = parser.parse_args(argv[1:])
+    parser.add_argument(
+        '--hostname', default='dash-test-1.appspot.com',
+        help='The AppEngine app FQDN. This should provide the base of the API.')
+    parser.add_argument(
+        '--api', default='hosts', help='The API name.')
+    parser.add_argument(
+        '--version', default='v1', help='The API version.')
+    parser.add_argument(
+        '--insecure', dest='secure', default=True, action="store_false",
+        help='Whether to disable HTTPS.')
 
-    # Acquire and store oauth token.
-    storage = oauth2client.file.Storage(CREDENTIALS_FILE)
-    credentials = storage.get()
+    options = parser.parse_args(argv[1:])
 
-    if credentials is None or credentials.invalid:
-      credentials = tools.run_flow(OAUTH2_FLOW, storage, flags)
-    http = credentials.authorize(httplib2.Http())
-    credentials.refresh(http)
+    credentials, http = local_oauth.GetCredentials(options)
 
-    # Build a service object for interacting with the API.
-    # NOTE: the default discovery url points to googleapis.com, so we must
-    # construct one that points to the appengine app api.
-    discovery_url = 'https://{0}/_ah/api/discovery/v1/apis/{1}/{2}/rest'.format(
-        flags.hostname, flags.api, flags.version)
+    discovery_url = local_oauth.GetDiscoveryURL(
+        options.hostname, options.api, options.version, options.secure)
     logging.info(discovery_url)
 
+    # Build a service object for interacting with the API.
     service = discovery.build(
-        flags.api, flags.version, discoveryServiceUrl=discovery_url,
+        options.api, options.version, discoveryServiceUrl=discovery_url,
         http=http, cache_discovery=False)
+    # credentials=credentials
 
-    # Setup datastore.
+    # Setup datastore with sample data.
     response = service.setup().execute()
     pprint.pprint(response)
 
+    # Create.
     response = service.create(body={'id': '64.123.0.65'}).execute()
     pprint.pprint(response)
 
+    # List all.
     response = service.list().execute()
     pprint.pprint(response)
 
+    # Delete the new one.
     response = service.delete(body={}, id='64.123.0.65').execute()
     pprint.pprint(response)
 
+    # List them all again.
     response = service.list().execute()
     pprint.pprint(response)
 
