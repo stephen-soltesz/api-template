@@ -13,23 +13,33 @@
 
         dev_appserver.py .
 
-4. Run query for discovery document
+4. Check that the REST discovery document is served by the local dev server.
+
+        DISCOVERY=http://localhost:8080/_ah/api/discovery/v1/apis/hosts/v1/rest
+        curl $DISCOVERY
+
+5. Run query for discovery document
 
         DISCOVERY=https://dash-test-1.appspot.com/_ah/api/discovery/v1/apis/hosts/v1/rest
         curl $DISCOVERY
 
-5. Run authenticated client request
+6. Run an authenticated client request
 
         cd clients
 	    ./client_discovery.py
 
-6. Generate the apitools, python client library.
+7. Generate the apitools, python client library, and install it locally.
 
         $ DISCOVERY=https://dash-test-1.appspot.com/_ah/api/discovery/v1/apis/hosts/v1/rest
         $ gen_client --discovery_url=$DISCOVERY \
             --overwrite --outdir=hosts --root_package=. pip_package
 	    $ cd hosts
 	    $ sudo python setup.py install
+
+8. Run an authenticated apitools client request.
+
+        cd clients
+	    ./client_apitools.py
 
 ## Linux
 
