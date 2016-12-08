@@ -2,49 +2,49 @@
 
 1. Install Google Cloud SDK (which includes AppEngine Python SDK)
 
-    ./setup.sh
+        ./setup.sh
 
 2. Install `endpoints_proto_datastore` module.
 
-    cd python
-    ./setup_python.sh
+        cd python
+        ./setup_python.sh
 
 3. Run `dev_appserver.py`
 
-    dev_appserver.py .
+        dev_appserver.py .
 
 4. Run query for discovery document
 
-    DISCOVERY=https://dash-test-1.appspot.com/_ah/api/discovery/v1/apis/hosts/v1/rest
-    curl $DISCOVERY
+        DISCOVERY=https://dash-test-1.appspot.com/_ah/api/discovery/v1/apis/hosts/v1/rest
+        curl $DISCOVERY
 
 5. Run authenticated client request
 
-    cd clients
-	./client_discovery.py
+        cd clients
+	    ./client_discovery.py
 
 6. Generate the apitools, python client library.
 
-    $ DISCOVERY=https://dash-test-1.appspot.com/_ah/api/discovery/v1/apis/hosts/v1/rest
-    $ gen_client --discovery_url=$DISCOVERY \
-        --overwrite --outdir=hosts --root_package=. pip_package
-	$ cd hosts
-	$ sudo python setup.py install
+        $ DISCOVERY=https://dash-test-1.appspot.com/_ah/api/discovery/v1/apis/hosts/v1/rest
+        $ gen_client --discovery_url=$DISCOVERY \
+            --overwrite --outdir=hosts --root_package=. pip_package
+	    $ cd hosts
+	    $ sudo python setup.py install
 
 ## Linux
 
 When using apitools
 
-    sudo pip install --upgrade pip
-    sudo pip install google-apitools python-gflags google-apputils
+        sudo pip install --upgrade pip
+        sudo pip install google-apitools python-gflags google-apputils
 
 ## Mac OS X
 
 If you encounter stack traces like those below, there may be a problem with
 permissions on the httplib2 cacerts.txt file.
 
-    sudo easy_install --upgrade google-api-python-client
-    sudo chmod o+r /Library/Python/2.7/site-packages/httplib2-0.9.2-py2.7.egg/httplib2/cacerts.txt
+        sudo easy_install --upgrade google-api-python-client
+        sudo chmod o+r /Library/Python/2.7/site-packages/httplib2-0.9.2-py2.7.egg/httplib2/cacerts.txt
 
 Example Traceback:
 
@@ -57,7 +57,6 @@ Example Traceback:
       File "build/bdist.macosx-10.11-intel/egg/oauth2client/tools.py", line 242, in run_flow
       File "build/bdist.macosx-10.11-intel/egg/oauth2client/_helpers.py", line 133, in positional_wrapper
       File "build/bdist.macosx-10.11-intel/egg/oauth2client/client.py", line 2047, in step2_exchange
-        
       File "build/bdist.macosx-10.11-intel/egg/oauth2client/transport.py", line 282, in request
       File "/Library/Python/2.7/site-packages/httplib2-0.9.2-py2.7.egg/httplib2/__init__.py", line 1610, in request
         (response, content) = self._request(conn, authority, uri, request_uri, method, body, headers, redirections, cachekey)
