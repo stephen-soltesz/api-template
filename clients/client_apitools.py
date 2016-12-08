@@ -9,7 +9,8 @@ import httplib2
 import oauth2client
 from oauth2client import tools
 
-import hosts_go as hosts
+# Generated from the hosts API discovery document, installed via apitools.
+from apitools.clients import hosts
 import local_oauth
 
 
@@ -27,23 +28,25 @@ def main(argv):
     client = hosts.HostsV1(credentials=credentials)
 
     # Setup datastore with sample data.
-    print client.api.Setup(hosts.HostsSetupRequest())
+    print 'Setup\n', client.api.Setup(hosts.HostsSetupRequest())
 
     # Create.
-    print client.api.Create(hosts.Host(id='64.123.0.22'))
+    print 'Create\n', client.api.Create(hosts.Host(id='64.123.0.22'))
 
     # List all.
+    print 'List\n'
     resp = client.api.List(hosts.HostsListRequest())
     for i, host in enumerate(resp.items):
-        print 'list', i, host
+        print '\tList', i, host
 
     # Delete the new one.
-    print client.api.Delete(hosts.Host(id='64.123.0.22'))
+    print 'Delete\n', client.api.Delete(hosts.Host(id='64.123.0.22'))
 
     # List them all again.
+    print 'List\n'
     resp = client.api.List(hosts.HostsListRequest())
     for i, host in enumerate(resp.items):
-        print 'list', i, host
+        print '\tList', i, host
 
 
 if __name__ == '__main__':
