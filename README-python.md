@@ -4,39 +4,44 @@
 
         ./setup.sh
 
-2. Install `endpoints_proto_datastore` module.
+1. Install `endpoints_proto_datastore` module.
 
         cd python
         ./setup_python.sh
 
-3. Run `dev_appserver.py`
+1. Run `dev_appserver.py`
 
         dev_appserver.py .
 
-4. Check that the REST discovery document is served by the local dev server.
+1. Check that the REST discovery document is served by the local dev server.
 
         DISCOVERY=http://localhost:8080/_ah/api/discovery/v1/apis/hosts/v1/rest
         curl $DISCOVERY
 
-5. Run query for discovery document
+1. Deploy app to AppEngine.
+
+		cd python
+        gcloud app deploy app.yaml
+
+  And, check the discovery doc again.
 
         DISCOVERY=https://dash-test-1.appspot.com/_ah/api/discovery/v1/apis/hosts/v1/rest
         curl $DISCOVERY
 
-6. Run an authenticated client request
+1. Run an authenticated client request
 
         cd clients
 	    ./client_discovery.py
 
-7. Generate the apitools, python client library, and install it locally.
+1. Generate the apitools, python client library, and install it locally.
 
-        $ DISCOVERY=https://dash-test-1.appspot.com/_ah/api/discovery/v1/apis/hosts/v1/rest
+        $ sudo pip install --upgrade google-apputils google-apitools
         $ gen_client --discovery_url=$DISCOVERY \
             --overwrite --outdir=hosts --root_package=. pip_package
 	    $ cd hosts
 	    $ sudo python setup.py install
 
-8. Run an authenticated apitools client request.
+1. Run an authenticated apitools client request.
 
         cd clients
 	    ./client_apitools.py

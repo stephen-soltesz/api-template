@@ -7,6 +7,7 @@
   Instead, install the full Google Cloud SDK, and then install the
   `app-engine-go` component.
 
+        ./setup.sh
         gcloud components install app-engine-go
 
   Then make the `goapp` command executable (as of google-cloud-sdk-135.0.0):
@@ -51,12 +52,14 @@
         DISCOVERY=https://dash-test-1.appspot.com/_ah/api/discovery/v1/apis/hosts/v1/rest
         curl $DISCOVERY
 
-1. Install / update apitools (and dependencies)
+1. Run a basic, authenticated client request:
+
+        cd clients
+	    ./client_discovery.py
+
+1. Generate the apitools, python client library, and install it locally.
 
         $ sudo pip install --upgrade google-apputils google-apitools
-
-1. Generate the python client library.
-
         $ gen_client --discovery_url=$DISCOVERY \
 	        --overwrite --outdir=hosts --root_package=. pip_package
 		$ cd hosts
