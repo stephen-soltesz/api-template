@@ -6,7 +6,9 @@ import (
 
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
 	"golang.org/x/net/context"
-	"google.golang.org/appengine/datastore"
+	"google.golang.org/api/iterator"
+	// "google.golang.org/appengine/datastore"
+	"cloud.google.com/go/datastore"
 	"google.golang.org/appengine/log"
 )
 
@@ -94,12 +96,31 @@ func (auth *HostsAPI) Create(c context.Context, r *Host) (*Host, error) {
 	return h, nil
 }
 
+func GetAll(client *datastore.Client, c context.Context, hosts *[]Host) error {
+	it := client.Run(c, datastore.NewQuery("HostsGo"))
+	for {
+		var h Host
+		_, err := it.Next(&h)
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			log.Errorf(c, "Query for all Hosts failed: %s", err)
+			return err
+		}
+		*hosts = append(*hosts, h)
+		// fmt.Println(key, p)
+	}
+	return nil
+}
+
 // List returns a list of all the existing quotes.
 // TODO: support more options for filtering results.
 func (auth *HostsAPI) List(c context.Context) (*HostCollection, error) {
 	hosts := []Host{}
 
-	_, err := datastore.NewQuery("HostsGo").GetAll(c, &hosts)
+	// _, err := datastore.NewQuery("HostsGo").GetAll(c, &hosts)
+	err := GetAll(GetDSClient(c), c, &hosts)
 	if err != nil {
 		log.Errorf(c, "Failed to query hostrecords: %s", err)
 		return nil, err
@@ -109,8 +130,11 @@ func (auth *HostsAPI) List(c context.Context) (*HostCollection, error) {
 
 // Deletes a Host record.
 func (auth *HostsAPI) Delete(c context.Context, r *Host) (*Host, error) {
-	key := datastore.NewKey(c, "HostsGo", r.IPAddress, 0, nil)
-	err := datastore.Delete(c, key)
+	// key := datastore.NewKey(c, "HostsGo", r.IPAddress, 0, nil)
+	// err := datastore.Delete(c, key)
+	key := datastore.NameKey("HostsGo", r.IPAddress, nil)
+	dsClient := GetDSClient(c)
+	err := dsClient.Delete(c, key)
 	return nil, err
 }
 
@@ -128,8 +152,11 @@ func (auth *HostsAPI) Get(c context.Context, r *GetRequest) (*Host, error) {
 // Setup the datastore with temporary data for testing.
 // TODO(soltesz): remove this function.
 func (api *HostsAPI) Setup(c context.Context) (*Host, error) {
-	h, err := PutHost(c, "127.0.0.1")
-	h, err = PutHost(c, "192.168.1.100")
-	h, err = PutHost(c, "10.128.3.7")
+	log.Debugf(c, "Adding ip 1")
+	h, err := PutHost(c, "172.0.0.2")
+	log.Debugf(c, "Adding ip 2")
+	h, err = PutHost(c, "129.168.1.200")
+	log.Debugf(c, "Adding ip 3")
+	h, err = PutHost(c, "20.128.3.7")
 	return h, err
 }

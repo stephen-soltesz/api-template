@@ -15,15 +15,19 @@ package hostsapi
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
 
+	"cloud.google.com/go/datastore"
 	"golang.org/x/net/context"
-	"google.golang.org/appengine/datastore"
+	// "google.golang.org/appengine/datastore"
 )
+
+// var dsClient *datastore.Client
 
 // Host records represent a single machine.
 type Host struct {
@@ -55,18 +59,46 @@ func init() {
 	RegisterMethod(api, "Setup", "GET", "setup", endpoints.EmailScope)
 
 	// Start handling cloud endpoint requests.
-	endpoints.DefaultServer.ContextDecorator = AuthDecorator
+	// endpoints.DefaultServer.ContextDecorator = AuthDecorator
 	endpoints.HandleHTTP()
 
 	// http.HandleFunc("/v1/hosts/127.0.0.1/proofOfConcept", Handler)
 	http.HandleFunc("/", HelloHandler)
+
+	// TODO: we are using the raw Datastore API instead of the appengine datastore library.
+	// TODO: add a flag for the GCP project-id.
+	// TODO: how to pass flags to appengine apps?
+	// projectID := "dash-test-1"
+
+	// Creates a client
+	// dsClient, err = datastore.NewClient(context.Background(), projectID)
+	// if err != nil {
+	// 	log.Fatalf("Failed to create client: %v", err)
+	// 	panic(err)
+	// }
+}
+
+func GetDSClient(ctx context.Context) *datastore.Client {
+	projectID := "dash-test-1"
+
+	// Creates a client
+	dsClient, err := datastore.NewClient(ctx, projectID)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+		panic(err)
+	}
+	return dsClient
 }
 
 // GetHost retrieves a Host record from Datastore.
 func GetHost(ctx context.Context, ipaddr string) (*Host, error) {
 	var h Host
-	key := datastore.NewKey(ctx, "HostsGo", ipaddr, 0, nil)
-	if err := datastore.Get(ctx, key, &h); err != nil {
+	// key := datastore.NewKey(ctx, "HostsGo", ipaddr, 0, nil)
+	// c := context.Background()
+	c := ctx
+	dsClient := GetDSClient(c)
+	key := datastore.NameKey("HostsGo", ipaddr, nil)
+	if err := dsClient.Get(ctx, key, &h); err != nil {
 		return nil, err
 	}
 	return &h, nil
@@ -79,8 +111,12 @@ func PutHost(ctx context.Context, ipaddr string) (*Host, error) {
 		// NOTE: python clients fail to decode the format of the 'date-time' type at nanosecond resolution.
 		Created: time.Now().UTC().Truncate(time.Second),
 	}
-	key := datastore.NewKey(ctx, "HostsGo", ipaddr, 0, nil)
-	if _, err := datastore.Put(ctx, key, &h); err != nil {
+	// c := context.Background()
+	c := ctx
+	dsClient := GetDSClient(c)
+	key := datastore.NameKey("HostsGo", ipaddr, nil)
+	// key := datastore.NewKey(ctx, "HostsGo", ipaddr, 0, nil)
+	if _, err := dsClient.Put(ctx, key, &h); err != nil {
 		return nil, err
 	}
 	return &h, nil
