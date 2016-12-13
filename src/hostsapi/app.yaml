@@ -1,8 +1,5 @@
-application: dash-test-1
 api_version: go1
 runtime: go
-# version: alpha-001
-version: v1-11
 
 handlers:
 - url: /.*
@@ -10,10 +7,3 @@ handlers:
 
 - url: /_ah/spi/.*
   script: _go_app
-
-#- url: /admin/.*
-#  script: _go_app
-#  login: admin
-#  secure: always
-#  auth_fail_action: unauthorized
-
